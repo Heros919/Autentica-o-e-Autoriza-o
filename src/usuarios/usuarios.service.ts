@@ -39,7 +39,7 @@ export class UsuariosService {
       nome: 'Carla Souza',
       email: 'carla@empresa.com',
       senhaHash:
-        '$2b$12$5S9LDbR3FznMAsZY5P..2OKE932dOHeVvGrmlfklgquClbkKgUidC',
+        '$2b$12$v.hh2HnVQqzy/gJ8hpSGkeen9mb5zjrXabN1rET3zFaQ9TP/S95VK',
       papel: 'auditor',
       ativo: true,
     },
