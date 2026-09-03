@@ -23,4 +23,6 @@ export class AuthController {
   perfil(@Req() request: RequisicaoAutenticada) {
     return request.user;
   }
+
+
 }

@@ -31,4 +31,5 @@ export class SolicitacoesController {
   aprovar(@Param('id', ParseIntPipe) id: number) {
     return this.solicitacoesService.aprovar(id);
   }
+  
 }
