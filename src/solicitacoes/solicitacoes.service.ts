@@ -11,29 +11,41 @@ export class SolicitacoesService {
     private readonly repository: Repository<Solicitacao>,
   ) {}
 
-  listar() {
-    return this.repository.find({ order: { id: 'ASC' } });
+  async criar(dto: CriarSolicitacaoDto): Promise<Solicitacao> {
+    const nova = this.repository.create({
+      ...dto,
+      status: 'pendente',
+    });
+    return await this.repository.save(nova);
   }
 
-  async buscarPorId(id: number) {
+  async listar(): Promise<Solicitacao[]> {
+    return await this.repository.find();
+  }
+
+  async gerarRelatorio() {
+    const total = await this.repository.count();
+    const pendentes = await this.repository.count({ where: { status: 'pendente' } });
+    const aprovadas = await this.repository.count({ where: { status: 'aprovada' } });
+
+    return {
+      total,
+      pendentes,
+      aprovadas,
+    };
+  }
+
+  async buscarPorId(id: number): Promise<Solicitacao> {
     const solicitacao = await this.repository.findOneBy({ id });
     if (!solicitacao) {
-      throw new NotFoundException('Solicitação não encontrada');
+      throw new NotFoundException(`Solicitação com ID ${id} não encontrada.`);
     }
     return solicitacao;
   }
 
-  criar(dto: CriarSolicitacaoDto) {
-    const solicitacao = this.repository.create({
-      titulo: dto.titulo,
-      status: 'pendente',
-    });
-    return this.repository.save(solicitacao);
-  }
-
-  async aprovar(id: number) {
+  async aprovar(id: number): Promise<Solicitacao> {
     const solicitacao = await this.buscarPorId(id);
     solicitacao.status = 'aprovada';
-    return this.repository.save(solicitacao);
+    return await this.repository.save(solicitacao);
   }
 }
