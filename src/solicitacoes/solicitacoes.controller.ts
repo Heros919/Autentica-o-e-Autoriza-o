@@ -6,17 +6,23 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { Roles } from '../auth/decorators/roles.decorator';
+
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+
 import { CriarSolicitacaoDto } from './dto/criar-solicitacao.dto';
+import { FiltrarSolicitacoesDto } from './dto/filtrar-solicitacoes.dto';
 import { SolicitacoesService } from './solicitacoes.service';
 
 @Controller('solicitacoes')
 export class SolicitacoesController {
-  constructor(private readonly service: SolicitacoesService) {}
+  constructor(
+    private readonly service: SolicitacoesService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -26,27 +32,26 @@ export class SolicitacoesController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  listar() {
-    return this.service.listar();
-  }
-
-  // Rota literal colocada ANTES de ':id' para evitar colisão de rotas
-  @UseGuards(JwtAuthGuard)
-  @Get('relatorio')
-  relatorio() {
-    return this.service.gerarRelatorio();
+  listar(
+    @Query() filtros: FiltrarSolicitacoesDto,
+  ) {
+    return this.service.listar(filtros);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  buscarPorId(@Param('id', ParseIntPipe) id: number) {
+  buscarPorId(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.service.buscarPorId(id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('gestor')
   @Patch(':id/aprovar')
-  aprovar(@Param('id', ParseIntPipe) id: number) {
+  aprovar(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.service.aprovar(id);
   }
 }

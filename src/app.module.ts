@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { SolicitacoesModule } from './solicitacoes/solicitacoes.module';
-import { UsuariosModule } from './usuarios/usuarios.module';
 
 @Module({
   imports: [
@@ -12,16 +11,19 @@ import { UsuariosModule } from './usuarios/usuarios.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        host: config.get<string>('DB_HOST') ?? 'localhost',
+        host: config.getOrThrow<string>('DB_HOST'),
         port: Number(config.get('DB_PORT') ?? 5432),
         database: config.getOrThrow<string>('DB_NAME'),
         username: config.getOrThrow<string>('DB_USER'),
         password: config.getOrThrow<string>('DB_PASSWORD'),
         autoLoadEntities: true,
         synchronize: true,
+        autoLoadEntities: true,
+        synchronize: false,
+      migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
+      migrationsRun: true,
       }),
     }),
-    UsuariosModule,
     AuthModule,
     SolicitacoesModule,
   ],

@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { CriarSolicitacaoDto } from './dto/criar-solicitacao.dto';
-import { Solicitacao } from './solicitacao.entity';
+import { FiltrarSolicitacoesDto } from './dto/filtrar-solicitacoes.dto';
+import {
+  Solicitacao,
+  StatusSolicitacao,
+} from './solicitacao.entity';
 
 @Injectable()
 export class SolicitacoesService {
@@ -11,41 +19,60 @@ export class SolicitacoesService {
     private readonly repository: Repository<Solicitacao>,
   ) {}
 
-  async criar(dto: CriarSolicitacaoDto): Promise<Solicitacao> {
-    const nova = this.repository.create({
-      ...dto,
+  async criar(dto: CriarSolicitacaoDto) {
+    const solicitacao = this.repository.create({
+      titulo: dto.titulo,
+      centroCusto: dto.centroCusto,
+      prioridade: dto.prioridade,
       status: 'pendente',
     });
-    return await this.repository.save(nova);
+
+    return this.repository.save(solicitacao);
   }
 
-  async listar(): Promise<Solicitacao[]> {
-    return await this.repository.find();
+  async listar(filtros: FiltrarSolicitacoesDto) {
+    return this.repository.find({
+      where: {
+        ...(filtros.status && {
+          status: filtros.status,
+        }),
+
+        ...(filtros.centroCusto && {
+          centroCusto: filtros.centroCusto,
+        }),
+
+        ...(filtros.prioridade && {
+          prioridade: filtros.prioridade,
+        }),
+      },
+
+      order: {
+        id: 'ASC',
+      },
+    });
   }
 
-  async gerarRelatorio() {
-    const total = await this.repository.count();
-    const pendentes = await this.repository.count({ where: { status: 'pendente' } });
-    const aprovadas = await this.repository.count({ where: { status: 'aprovada' } });
+  async buscarPorId(id: number) {
+    const solicitacao = await this.repository.findOne({
+      where: {
+        id,
+      },
+    });
 
-    return {
-      total,
-      pendentes,
-      aprovadas,
-    };
-  }
-
-  async buscarPorId(id: number): Promise<Solicitacao> {
-    const solicitacao = await this.repository.findOneBy({ id });
     if (!solicitacao) {
-      throw new NotFoundException(`Solicitação com ID ${id} não encontrada.`);
+      throw new NotFoundException(
+        'Solicitação não encontrada',
+      );
     }
+
     return solicitacao;
   }
 
-  async aprovar(id: number): Promise<Solicitacao> {
+  async aprovar(id: number) {
     const solicitacao = await this.buscarPorId(id);
+
     solicitacao.status = 'aprovada';
-    return await this.repository.save(solicitacao);
+
+    return this.repository.save(solicitacao);
   }
 }
