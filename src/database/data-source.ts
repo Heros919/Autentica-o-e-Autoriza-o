@@ -1,8 +1,7 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
-import { Solicitacao } from '../solicitacoes/solicitacao.entity';
 import { Auditoria } from '../auditoria/auditoria.entity';
-
+import { Solicitacao } from '../solicitacoes/solicitacao.entity';
 
 export default new DataSource({
   type: 'postgres',

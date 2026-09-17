@@ -1,14 +1,13 @@
-import {
-  IsIn,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
+import type {
+  PrioridadeSolicitacao,
+  StatusSolicitacao,
+} from '../solicitacao.entity';
 
 export class FiltrarSolicitacoesDto {
   @IsOptional()
   @IsIn(['pendente', 'aprovada'])
-  status?: 'pendente' | 'aprovada';
+  status?: StatusSolicitacao;
 
   @IsOptional()
   @IsString()
@@ -17,5 +16,5 @@ export class FiltrarSolicitacoesDto {
 
   @IsOptional()
   @IsIn(['normal', 'urgente'])
-  prioridade?: 'normal' | 'urgente';
+  prioridade?: PrioridadeSolicitacao;
 }
