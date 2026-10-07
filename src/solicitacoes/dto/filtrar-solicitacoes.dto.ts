@@ -6,7 +6,7 @@ import type {
 
 export class FiltrarSolicitacoesDto {
   @IsOptional()
-  @IsIn(['pendente', 'aprovada'])
+  @IsIn(['pendente', 'aprovada', 'rejeitada'])
   status?: StatusSolicitacao;
 
   @IsOptional()

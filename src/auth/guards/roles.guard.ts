@@ -18,6 +18,12 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    return papeisExigidos.includes(request.user?.papel);
+    const papelUsuario = request.user?.papel;
+
+    if (!papelUsuario) {
+      return false;
+    }
+
+    return papeisExigidos.some((papel) => papel === papelUsuario);
   }
 }
