@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AnotacoesModule } from './anotacoes/anotacoes.module';
 import { AuthModule } from './auth/auth.module';
 import { SolicitacoesModule } from './solicitacoes/solicitacoes.module';
 
@@ -22,8 +24,15 @@ import { SolicitacoesModule } from './solicitacoes/solicitacoes.module';
         migrationsRun: true,
       }),
     }),
+    MongooseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        uri: config.getOrThrow<string>('MONGODB_URI'),
+      }),
+    }),
     AuthModule,
     SolicitacoesModule,
+    AnotacoesModule,
   ],
 })
 export class AppModule {}
